@@ -1,0 +1,49 @@
+package eu.svez.akka.stream.cats
+
+import akka.NotUsed
+import akka.stream.SinkShape
+import akka.stream.scaladsl.{GraphDSL, Sink, Source}
+import akka.stream.testkit.TestSubscriber
+import cats.implicits._
+
+class PartitionValidatedSpec extends Spec {
+
+  "PartitionValidation" should "partition a flow of Validation[E, A] in two flows of E and A" in new Test {
+    val src = Source(List(
+      1.valid[String],
+      2.valid[String],
+      "BOOM!".invalid[Int],
+      3.valid[String],
+      "BOOM 2!".invalid[Int]
+    ))
+
+    src.runWith(testSink)
+
+    successProbe.request(3)
+    failureProbe.request(2)
+
+    successProbe.expectNext(1)
+    successProbe.expectNext(2)
+    successProbe.expectNext(3)
+    failureProbe.expectNext("BOOM!")
+    failureProbe.expectNext("BOOM 2!")
+    successProbe.expectComplete()
+    failureProbe.expectComplete()
+  }
+
+  trait Test {
+    val failureProbe = TestSubscriber.probe[String]()
+    val successProbe = TestSubscriber.probe[Int]()
+
+    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+      import GraphDSL.Implicits._
+
+      val partVal = builder.add(PartitionValidated[String, Int]())
+
+      partVal.out0 ~> Sink.fromSubscriber(failureProbe)
+      partVal.out1 ~> Sink.fromSubscriber(successProbe)
+
+      SinkShape(partVal.in)
+    })
+  }
+}

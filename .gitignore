@@ -1,0 +1,13 @@
+target/
+
+# Eclipse
+/.project
+/.settings
+/.classpath
+/bin
+/.cache
+
+# IntelliJ Idea
+.idea
+.idea_modules
+.DS_Store
