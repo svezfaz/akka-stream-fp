@@ -5,6 +5,7 @@ import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
 import cats.implicits._
+import eu.svez.akka.stream.cats.Datatypes._
 
 class PartitionValidatedSpec extends Spec {
 
@@ -40,8 +41,8 @@ class PartitionValidatedSpec extends Spec {
 
       val partVal = builder.add(PartitionValidated[String, Int]())
 
-      partVal.out0 ~> Sink.fromSubscriber(failureProbe)
-      partVal.out1 ~> Sink.fromSubscriber(successProbe)
+      partVal.invalid ~> Sink.fromSubscriber(failureProbe)
+      partVal.valid ~> Sink.fromSubscriber(successProbe)
 
       SinkShape(partVal.in)
     })
