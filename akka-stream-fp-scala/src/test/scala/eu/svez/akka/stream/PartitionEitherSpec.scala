@@ -1,33 +1,32 @@
-package eu.svez.akka.stream.cats
+package eu.svez.akka.stream
 
 import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import cats.data.Ior
-import eu.svez.akka.stream.cats.Stages._
+import Stages._
 
-class IorSpec extends Spec {
+class PartitionEitherSpec extends StageSpec {
 
-  "IorStage" should "emit " in new Test {
+  "PartitionEither" should "partition a flow of Either[A, B] into two flows of A and B" in new Test {
     val src = Source(List(
-      Ior.Right(1),
-      Ior.Right(2),
-      Ior.Left("BOOM!"),
-      Ior.Right(3),
-      Ior.Left("BOOM 2!")
+      Right(1),
+      Right(2),
+      Left("One"),
+      Right(3),
+      Left("Two")
     ))
 
     src.runWith(testSink)
 
-    rightProbe.request(3)
-    leftProbe.request(2)
+    rightProbe.request(4)
+    leftProbe.request(3)
 
     rightProbe.expectNext(1)
     rightProbe.expectNext(2)
     rightProbe.expectNext(3)
-    leftProbe.expectNext("BOOM!")
-    leftProbe.expectNext("BOOM 2!")
+    leftProbe.expectNext("One")
+    leftProbe.expectNext("Two")
     rightProbe.expectComplete()
     leftProbe.expectComplete()
   }
@@ -39,7 +38,7 @@ class IorSpec extends Spec {
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
       import GraphDSL.Implicits._
 
-      val iorStage = builder.add(IorStage[String, Int]())
+      val iorStage = builder.add(PartitionEither[String, Int]())
 
       iorStage.left ~> Sink.fromSubscriber(leftProbe)
       iorStage.right ~> Sink.fromSubscriber(rightProbe)

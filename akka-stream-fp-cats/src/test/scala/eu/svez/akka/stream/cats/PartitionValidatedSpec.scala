@@ -7,7 +7,7 @@ import akka.stream.testkit.TestSubscriber
 import cats.implicits._
 import eu.svez.akka.stream.cats.Stages._
 
-class ValidatedSpec extends Spec {
+class PartitionValidatedSpec extends StageSpec {
 
   "ValidatedStage" should "partition a flow of Validation[E, A] in two flows of E and A" in new Test {
     val src = Source(List(
@@ -39,7 +39,7 @@ class ValidatedSpec extends Spec {
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
       import GraphDSL.Implicits._
 
-      val valStage = builder.add(ValidatedStage[String, Int]())
+      val valStage = builder.add(PartitionValidated[String, Int]())
 
       valStage.invalid ~> Sink.fromSubscriber(failureProbe)
       valStage.valid ~> Sink.fromSubscriber(successProbe)

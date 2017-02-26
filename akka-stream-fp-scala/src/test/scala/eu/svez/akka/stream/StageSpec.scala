@@ -1,11 +1,11 @@
-package eu.svez.akka.stream.cats
+package eu.svez.akka.stream
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
 
-trait Spec extends FlatSpecLike with Matchers with BeforeAndAfterAll {
+trait StageSpec extends FlatSpecLike with Matchers with BeforeAndAfterAll {
 
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
