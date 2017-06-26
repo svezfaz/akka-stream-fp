@@ -2,7 +2,9 @@ package eu.svez.akka.stream
 
 import akka.NotUsed
 import akka.stream.FanOutShape2
-import akka.stream.scaladsl.{Flow, GraphDSL, Partition}
+import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Partition, Sink}
+
+import scala.annotation.tailrec
 
 object Stages {
 
@@ -24,6 +26,25 @@ object Stages {
   implicit class EitherShape[A, B](val shape: FanOutShape2[Either[A, B], A, B]) extends AnyVal {
     def left = shape.out0
     def right = shape.out1
+  }
+
+  object BroadcastMat {
+
+    def apply[In, Mat](first: Sink[In, Mat], second: Sink[In, Mat], rest: Sink[In, Mat]*): Sink[In, List[Mat]] = {
+
+      def lift(sink: Sink[In, Mat]): Sink[In, List[Mat]] = sink.mapMaterializedValue(List(_))
+
+      @tailrec
+      def aux(sinks: List[Sink[In, Mat]], acc: Flow[In, In, List[Mat]]): Flow[In, In, List[Mat]] = sinks match {
+        case s :: ss ⇒ aux(ss, acc.alsoToMat(lift(s))(_ ++ _))
+        case _       ⇒ acc
+      }
+
+      val (middle :+ last) = second :: rest.toList
+
+      aux(middle, Flow[In].alsoToMat(lift(first))(Keep.right))
+        .toMat(lift(last))(_ ++ _)
+    }
   }
 
 }
