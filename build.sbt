@@ -1,17 +1,10 @@
 
-val akkaV = "2.5.3"
-val catsV = "0.9.0"
-
 val commonSettings = Seq(
   organization := "eu.svez",
   version := "0.1-SNAPSHOT",
   crossScalaVersions := Seq("2.11.11", "2.12.2"),
   scalaVersion := crossScalaVersions.value.head,
-  libraryDependencies ++= Seq(
-    "com.typesafe.akka" %% "akka-stream" % akkaV,
-    "com.typesafe.akka" %% "akka-stream-testkit" % akkaV % Test,
-    "org.scalatest" %% "scalatest" % "3.0.0" % Test
-  )
+  Dependencies.common
 )
 
 lazy val `akka-stream-fp` = (project in file(".")).
@@ -34,6 +27,6 @@ lazy val `akka-stream-fp-cats` = (project in file("./akka-stream-fp-cats")).
   settings(
     description := "Interop toolkit for akka streams and Typelevel cats datatypes",
     name := "akka-stream-fp-cats",
-    libraryDependencies ++= Seq("org.typelevel" %% "cats" % catsV)
+    Dependencies.cats
   ).
   dependsOn(`akka-stream-fp-scala`)
