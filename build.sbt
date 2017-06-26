@@ -1,11 +1,11 @@
 
-val akkaV = "2.4.16"
+val akkaV = "2.5.3"
 val catsV = "0.9.0"
 
 val commonSettings = Seq(
   organization := "eu.svez",
   version := "0.1-SNAPSHOT",
-  crossScalaVersions := Seq("2.11.8"),
+  crossScalaVersions := Seq("2.11.11", "2.12.2"),
   scalaVersion := crossScalaVersions.value.head,
   libraryDependencies ++= Seq(
     "com.typesafe.akka" %% "akka-stream" % akkaV,

@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.FanOutShape2
 import akka.stream.scaladsl.{Flow, GraphDSL}
 import cats.data.Ior.{Left, Right}
-import cats.data.{Ior, Validated}
+import cats.data.{Ior, Validated, ValidatedNel}
 import eu.svez.akka.stream.Stages._
 
 object Stages {
