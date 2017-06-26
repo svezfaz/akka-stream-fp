@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.FanOutShape2
 import akka.stream.scaladsl.{Flow, GraphDSL}
 import cats.data.Ior.{Left, Right}
-import cats.data.{Ior, Validated, ValidatedNel}
+import cats.data.{Ior, NonEmptyList, Validated, ValidatedNel}
 import eu.svez.akka.stream.Stages._
 
 object Stages {
@@ -23,6 +23,25 @@ object Stages {
   }
 
   implicit class ValidatedShape[E, A](val shape: FanOutShape2[Validated[E, A], E, A]) extends AnyVal{
+    def invalid = shape.out0
+    def valid = shape.out1
+  }
+
+  object PartitionValidatedNel {
+    def apply[E, A]() = GraphDSL.create[FanOutShape2[ValidatedNel[E, A], E, A]]() { implicit builder: GraphDSL.Builder[NotUsed] =>
+      import GraphDSL.Implicits._
+
+      val validated = builder.add(PartitionValidated[NonEmptyList[E], A]())
+
+      new FanOutShape2[ValidatedNel[E, A], E, A](
+        validated.in,
+        validated.invalid.mapConcat(_.toList).outlet,
+        validated.valid
+      )
+    }
+  }
+
+  implicit class ValidatedNelShape[E, A](val shape: FanOutShape2[ValidatedNel[E, A], E, A]) extends AnyVal{
     def invalid = shape.out0
     def valid = shape.out1
   }

@@ -4,29 +4,31 @@ import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
+import cats.data.NonEmptyList
 import cats.implicits._
 import eu.svez.akka.stream.cats.Stages._
 
-class PartitionValidatedSpec extends StageSpec {
+class PartitionValidatedNelSpec extends StageSpec {
 
-  "PartitionValidated" should "partition a flow of Validation[E, A] in two flows of E and A" in new Test {
+  "PartitionValidatedNel" should "partition a flow of Validation[E, A] in two flows of E and A" in new Test {
     val src = Source(List(
-      1.valid[String],
-      2.valid[String],
-      "BOOM!".invalid[Int],
-      3.valid[String],
-      "BOOM 2!".invalid[Int]
+      1.valid[NonEmptyList[String]],
+      2.valid[NonEmptyList[String]],
+      NonEmptyList.of("BOOM!", "KABOOM!").invalid[Int],
+      3.valid[NonEmptyList[String]],
+      NonEmptyList.of("BOOM 2!").invalid[Int]
     ))
 
     src.runWith(testSink)
 
     successProbe.request(3)
-    failureProbe.request(2)
+    failureProbe.request(3)
 
     successProbe.expectNext(1)
     successProbe.expectNext(2)
     successProbe.expectNext(3)
     failureProbe.expectNext("BOOM!")
+    failureProbe.expectNext("KABOOM!")
     failureProbe.expectNext("BOOM 2!")
     successProbe.expectComplete()
     failureProbe.expectComplete()
@@ -39,7 +41,7 @@ class PartitionValidatedSpec extends StageSpec {
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
       import GraphDSL.Implicits._
 
-      val valStage = builder.add(PartitionValidated[String, Int]())
+      val valStage = builder.add(PartitionValidatedNel[String, Int]())
 
       valStage.invalid ~> Sink.fromSubscriber(failureProbe)
       valStage.valid ~> Sink.fromSubscriber(successProbe)

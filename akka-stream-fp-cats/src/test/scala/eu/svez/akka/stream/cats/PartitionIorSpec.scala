@@ -9,7 +9,7 @@ import eu.svez.akka.stream.cats.Stages._
 
 class PartitionIorSpec extends StageSpec {
 
-  "IorStage" should "partition a flow of Ior[A, B] into two flows of A and B" in new Test {
+  "PartitionIor" should "partition a flow of Ior[A, B] into two flows of A and B" in new Test {
     val src = Source(List(
       Ior.Right(1),
       Ior.Right(2),
