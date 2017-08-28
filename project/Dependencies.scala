@@ -9,6 +9,6 @@ object Dependencies {
     "org.typelevel"     %% "cats-core"           % catsVersion,
     "com.typesafe.akka" %% "akka-stream"         % akkaVersion,
     "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
-    "org.scalatest"     %% "scalatest"           % "3.0.3" % Test
+    "org.scalatest"     %% "scalatest"           % "3.0.3"     % Test
   )
 }
