@@ -1,15 +1,14 @@
-package eu.svez.akka.stream.cats
+package eu.svez.akka.stream
 
 import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import cats.implicits._
-import eu.svez.akka.stream.cats.Stages._
+import cats.syntax.validated._
 
 class PartitionValidatedSpec extends StageSpec {
 
-  "PartitionValidated" should "partition a flow of Validation[E, A] in two flows of E and A" in new Test {
+  "PartitionValidated" should "partition a flow of Validated[E, A] in two flows of E and A" in new Test {
     val src = Source(List(
       1.valid[String],
       2.valid[String],
@@ -38,6 +37,7 @@ class PartitionValidatedSpec extends StageSpec {
 
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
       import GraphDSL.Implicits._
+      import partitions._
 
       val valStage = builder.add(PartitionValidated[String, Int]())
 

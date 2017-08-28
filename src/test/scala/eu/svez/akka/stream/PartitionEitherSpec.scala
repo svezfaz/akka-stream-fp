@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import Stages._
+import partitions._
 
 class PartitionEitherSpec extends StageSpec {
 

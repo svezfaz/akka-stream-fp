@@ -1,11 +1,10 @@
-package eu.svez.akka.stream.cats
+package eu.svez.akka.stream
 
 import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
 import cats.data.Ior
-import eu.svez.akka.stream.cats.Stages._
 
 class PartitionIorSpec extends StageSpec {
 
@@ -41,6 +40,7 @@ class PartitionIorSpec extends StageSpec {
 
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
       import GraphDSL.Implicits._
+      import partitions._
 
       val iorStage = builder.add(PartitionIor[String, Int]())
 

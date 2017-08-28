@@ -1,32 +1,25 @@
 
-val commonSettings = Seq(
-  organization := "eu.svez",
-  version := "0.1-SNAPSHOT",
-  crossScalaVersions := Seq("2.11.11", "2.12.2"),
-  scalaVersion := crossScalaVersions.value.head,
-  Dependencies.common
-)
-
-lazy val `akka-stream-fp` = (project in file(".")).
-  settings(commonSettings: _*).
-  settings(
-    description := "Interop toolkit for akka streams and functional programming libraries",
-    name := "akka-stream-fp"
-  ).
-  aggregate(`akka-stream-fp-scala`, `akka-stream-fp-cats`)
-
-lazy val `akka-stream-fp-scala` = (project in file("./akka-stream-fp-scala")).
-  settings(commonSettings: _*).
-  settings(
-    description := "Interop toolkit for akka streams and Scala standard library datatypes",
-    name := "akka-stream-fp-scala"
+lazy val root = (project in file("."))
+  .settings(
+    organization := "eu.svez",
+    name := "akka-stream-fp",
+    version := "0.1-SNAPSHOT",
+    description := "Akka Streams helper toolkit to build complex, referentially transparent streaming applications",
+    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    scalaVersion := crossScalaVersions.value.head,
+    libraryDependencies ++= Dependencies.all,
+    scalacOptions in Compile ++= Seq(
+      "-encoding", "UTF-8",
+      "-target:jvm-1.8",
+      "-feature",
+      "-deprecation",
+      "-unchecked",
+      "-Xlint",
+      "-Xfuture",
+      "-Ywarn-dead-code",
+      "-Ywarn-unused-import",
+      "-Ywarn-unused",
+      "-Ywarn-nullary-unit"
+    )
   )
 
-lazy val `akka-stream-fp-cats` = (project in file("./akka-stream-fp-cats")).
-  settings(commonSettings: _*).
-  settings(
-    description := "Interop toolkit for akka streams and Typelevel cats datatypes",
-    name := "akka-stream-fp-cats",
-    Dependencies.cats
-  ).
-  dependsOn(`akka-stream-fp-scala`)

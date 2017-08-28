@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import eu.svez.akka.stream.Stages._
+import eu.svez.akka.stream.partitions._
 
 import scala.util.{Failure, Success}
 
