@@ -35,7 +35,7 @@ class PartitionEitherSpec extends StageSpec {
     val leftProbe = TestSubscriber.probe[String]()
     val rightProbe = TestSubscriber.probe[Int]()
 
-    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
       import GraphDSL.Implicits._
 
       val eitherStage = builder.add(PartitionEither[String, Int]())

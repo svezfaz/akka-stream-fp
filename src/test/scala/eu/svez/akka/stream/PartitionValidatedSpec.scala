@@ -35,7 +35,7 @@ class PartitionValidatedSpec extends StageSpec {
     val failureProbe = TestSubscriber.probe[String]()
     val successProbe = TestSubscriber.probe[Int]()
 
-    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
       import GraphDSL.Implicits._
       import partitions._
 

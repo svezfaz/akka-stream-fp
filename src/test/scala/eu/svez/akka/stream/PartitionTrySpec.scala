@@ -44,7 +44,7 @@ class PartitionTrySpec extends StageSpec {
     val failureProbe = TestSubscriber.probe[Throwable]()
     val successProbe = TestSubscriber.probe[Int]()
 
-    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+    val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
       import GraphDSL.Implicits._
 
       val tryStage = builder.add(PartitionTry[Int]())

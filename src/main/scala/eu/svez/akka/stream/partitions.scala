@@ -1,28 +1,27 @@
 package eu.svez.akka.stream
 
 import akka.NotUsed
-import akka.stream.{FanOutShape2, Graph, Outlet}
+import akka.stream.scaladsl.GraphDSL.Implicits._
 import akka.stream.scaladsl.{Flow, GraphDSL, Partition}
-
-import scala.util.{Failure, Success, Try}
-import GraphDSL.Implicits._
-import cats.data.{Ior, NonEmptyList, Validated, ValidatedNel}
+import akka.stream.{FanOutShape2, Graph, Outlet}
 import cats.data.Ior._
+import cats.data.{Ior, NonEmptyList, Validated, ValidatedNel}
+
+import scala.util.Try
 
 object partitions {
 
   object PartitionEither {
     def apply[A, B](): Graph[FanOutShape2[Either[A, B], A, B], NotUsed] =
-      GraphDSL.create[FanOutShape2[Either[A, B], A, B]]() { implicit builder: GraphDSL.Builder[NotUsed] =>
+      GraphDSL.create[FanOutShape2[Either[A, B], A, B]]() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
+        val left      = builder.add(Flow[Either[A, B]].map (_.left.get))
+        val right     = builder.add(Flow[Either[A, B]].map (_.right.get))
+        val partition = builder.add(Partition[Either[A, B]](2, _.fold(_ ⇒ 0, _ ⇒ 1)))
 
-      val left      = builder.add(Flow[Either[A, B]].map (_.left.get))
-      val right     = builder.add(Flow[Either[A, B]].map (_.right.get))
-      val partition = builder.add(Partition[Either[A, B]](2, _.fold(_ ⇒ 0, _ ⇒ 1)))
+        partition ~> left
+        partition ~> right
 
-      partition ~> left
-      partition ~> right
-
-      new FanOutShape2[Either[A, B], A, B](partition.in, left.out, right.out)
+        new FanOutShape2[Either[A, B], A, B](partition.in, left.out, right.out)
     }
   }
 
@@ -35,14 +34,12 @@ object partitions {
     def apply[T](): Graph[FanOutShape2[Try[T], Throwable, T], NotUsed] =
       GraphDSL.create[FanOutShape2[Try[T], Throwable, T]]() { implicit builder ⇒
 
-      val success   = builder.add(Flow[Try[T]].collect { case Success(a) ⇒ a })
-      val failure   = builder.add(Flow[Try[T]].collect { case Failure(t) ⇒ t })
-      val partition = builder.add(Partition[Try[T]](2, _.map(_ ⇒ 1).getOrElse(0)))
+        val toEither = builder.add(Flow.fromFunction((v: Try[T]) ⇒ v.toEither))
+        val either   = builder.add(PartitionEither[Throwable, T]())
 
-      partition ~> failure
-      partition ~> success
+        toEither ~> either.in
 
-      new FanOutShape2[Try[T], Throwable, T](partition.in, failure.out, success.out)
+        new FanOutShape2[Try[T], Throwable, T](toEither.in, either.left, either.right)
     }
   }
 
@@ -53,7 +50,7 @@ object partitions {
 
   object PartitionValidated {
     def apply[E, A](): Graph[FanOutShape2[Validated[E, A], E, A], NotUsed] =
-      GraphDSL.create[FanOutShape2[Validated[E, A], E, A]]() { implicit builder: GraphDSL.Builder[NotUsed] =>
+      GraphDSL.create[FanOutShape2[Validated[E, A], E, A]]() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
 
         val toEither = builder.add(Flow.fromFunction((v: Validated[E, A]) ⇒ v.toEither))
         val either   = builder.add(PartitionEither[E, A]())
@@ -71,7 +68,7 @@ object partitions {
 
   object PartitionValidatedNel {
     def apply[E, A](): Graph[FanOutShape2[ValidatedNel[E, A], E, A], NotUsed] =
-      GraphDSL.create[FanOutShape2[ValidatedNel[E, A], E, A]]() { implicit builder: GraphDSL.Builder[NotUsed] =>
+      GraphDSL.create[FanOutShape2[ValidatedNel[E, A], E, A]]() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
 
         val validated = builder.add(PartitionValidated[NonEmptyList[E], A]())
 
@@ -90,7 +87,7 @@ object partitions {
 
   object PartitionIor {
     def apply[A, B](): Graph[FanOutShape2[Ior[A, B], A, B], NotUsed] =
-      GraphDSL.create[FanOutShape2[Ior[A, B], A, B]]() { implicit builder: GraphDSL.Builder[NotUsed] =>
+      GraphDSL.create[FanOutShape2[Ior[A, B], A, B]]() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
 
         val flatten = builder.add(Flow[Ior[A, B]]
           .mapConcat(_.fold(a ⇒ List(Left(a)), b ⇒ List(Right(b)), (a, b) ⇒ List(Left(a), Right(b))))
