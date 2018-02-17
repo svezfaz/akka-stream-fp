@@ -2,8 +2,8 @@ import sbt._
 
 object Dependencies {
 
-  val akkaVersion      = "2.5.4"
-  val catsVersion      = "1.0.0-MF"
+  val akkaVersion      = "2.5.9"
+  val catsVersion      = "1.0.1"
   val scalatestVersion = "3.0.4"
 
   val all = Seq(
