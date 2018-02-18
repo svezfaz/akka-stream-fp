@@ -1,4 +1,4 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer

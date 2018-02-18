@@ -1,4 +1,4 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.NotUsed
 import akka.stream.SinkShape
@@ -37,7 +37,7 @@ class PartitionValidatedSpec extends StageSpec {
 
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
       import GraphDSL.Implicits._
-      import partitions._
+      import svez.akka.stream.stages.partitions._
 
       val valStage = builder.add(PartitionValidated[String, Int]())
 

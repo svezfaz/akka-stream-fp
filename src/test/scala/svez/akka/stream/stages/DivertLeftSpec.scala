@@ -1,8 +1,8 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import eu.svez.akka.stream.diverters._
+import svez.akka.stream.stages.diverters._
 
 class DivertLeftSpec extends StageSpec {
 

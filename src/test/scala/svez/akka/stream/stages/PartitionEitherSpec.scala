@@ -1,10 +1,10 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.NotUsed
 import akka.stream.SinkShape
 import akka.stream.scaladsl.{GraphDSL, Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import partitions._
+import svez.akka.stream.stages.partitions._
 
 class PartitionEitherSpec extends StageSpec {
 

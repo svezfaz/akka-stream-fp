@@ -1,4 +1,4 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.NotUsed
 import akka.stream.SinkShape
@@ -40,7 +40,7 @@ class PartitionIorSpec extends StageSpec {
 
     val testSink = Sink.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] ⇒
       import GraphDSL.Implicits._
-      import partitions._
+      import svez.akka.stream.stages.partitions._
 
       val iorStage = builder.add(PartitionIor[String, Int]())
 

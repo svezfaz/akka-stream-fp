@@ -1,8 +1,8 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.testkit.TestSubscriber
-import eu.svez.akka.stream.diverters._
+import svez.akka.stream.stages.diverters._
 
 class DivertAuditSpec extends StageSpec {
 
@@ -10,7 +10,7 @@ class DivertAuditSpec extends StageSpec {
   val resultProbe = TestSubscriber.probe[Int]()
 
   val auditTestSink = Sink.fromSubscriber(auditProbe)
-  val testSink     = Sink.fromSubscriber(resultProbe)
+  val testSink      = Sink.fromSubscriber(resultProbe)
 
   "DivertAudit" should "divert the Audits to the provided Sink, while passing on the results" in {
     val src = Source(List(

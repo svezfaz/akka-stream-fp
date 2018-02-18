@@ -1,4 +1,4 @@
-package eu.svez.akka.stream
+package svez.akka.stream.stages
 
 import akka.NotUsed
 import akka.stream.scaladsl.GraphDSL.Implicits._
