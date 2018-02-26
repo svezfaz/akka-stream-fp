@@ -37,5 +37,6 @@ lazy val examples = project.in(file("examples"))
   .settings(Seq(
     name := "akka-stream-fp-examples",
     publishArtifact := false,
-    libraryDependencies ++= Dependencies.examples
+    libraryDependencies ++= Dependencies.examples,
+    scalacOptions in Compile ~= { _ filterNot { o ⇒ o == "-Xfatal-warnings" } }
   ))
